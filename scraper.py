@@ -34,7 +34,8 @@ options.set_preference("general.useragent.override",
 service = Service(GeckoDriverManager().install())
 driver = webdriver.Firefox(service=service, options=options)
 
-base_url = "https://www.century21albania.com/en/properties?keyword=Apartment&q=&business_type=sale&city=Tirana&bedrooms=&price%5Bmin%5D=&price%5Bmax%5D=&area%5Bmin%5D=&area%5Bmax%5D=&extra%5Belevator%5D=&property_status="
+# Base URL (without page number)
+base_url = "https://www.century21albania.com/en/properties?keyword=Apartment&business_type=sale&city=Tirana&page="
 driver.get(base_url)
 wait = WebDriverWait(driver, 5)  # Wait up to 10 seconds
 
@@ -53,10 +54,8 @@ if "Access" in driver.title or "blocked" in driver.page_source.lower():
 # print(driver.page_source)
 
 scraped_data = []
-page_number_element = driver.find_element(By.CSS_SELECTOR, "input[name='page']")
-page_number_str = page_number_element.get_attribute("value")
-page_number=int(page_number_str)
-print(page_number)
+# Starting page
+page_number = 1
 
 # Scroll down multiple times to load all listings
 for _ in range(3):  # Scroll multiple times
@@ -66,8 +65,18 @@ for _ in range(3):  # Scroll multiple times
 
 while True:
     print(f"Scraping page {page_number}...")
-    wait = WebDriverWait(driver, 15)
+  
     try:
+          # Construct the URL for the current page
+        current_url = f"{base_url}{page_number}"
+        print(f"Scraping page {page_number}... URL: {current_url}")
+        
+        # Load the page
+        driver.get(current_url)
+        time.sleep(random.uniform(5, 12))  # Wait for the page to load
+        
+        # Wait for the listings to load
+        wait = WebDriverWait(driver, 15)
         listings = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, "div.grid-property_card")))
 
     except:
@@ -160,24 +169,14 @@ while True:
            
         })
 
-    # Pagination: Check if a "Next Page" button exists
-    try:
-        next_button_element=wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "a.arrow.flex.justify-center.items-center.text-grey-shade-08")))
-
-        #next_button_element = driver.find_element(By.CSS_SELECTOR, "a.arrow.flex.justify-center.items-center.text-grey-shade-08")
-        #new WebDriverWait(driver, 20).until(ExpectedConditions.elementToBeClickable(next_button)).click();
-
-        next_button = next_button_element.get_attribute("href")
-        print(next_button)
-        next_button.click()  #Directly load the next page
-        time.sleep(10)  # Wait for new page to load
-        #page_number +=1
-        print(page_number)
-
-    except:
-        print("🚫 No more pages. Scraping complete.")
-        break
-
+   
+    if len(listings) > 0:
+            page_number += 1
+    else:
+            print("🚫 No listings found. Exiting scraping process.")
+            break
+    
+    
 df = pd.DataFrame(scraped_data)
 df.to_csv(r"C:\Users\User\Desktop\datapipeline\tirana_forsale_test.csv", index=False)
 print(f"✅{len(df)} listings saved!")
