@@ -46,7 +46,7 @@ Start the Streamlit dashboard:
 ```bash
 streamlit run dashboard.py
 ```
-![Example Image](https://github.com/SaraBallkoci/Real_Estate_project/main/dashboard.PNG)
+![Example Image](https://github.com/SaraBallkoci/Real_Estate_project/blob/main/dashboard.PNG)
 ## Data Structure
 The dataset includes the following information for each property:
 - Price (in EUR)
