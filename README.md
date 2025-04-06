@@ -1,8 +1,8 @@
-```markdown
-#Tirana Real Estate Analysis Dashboard
+
+## Tirana Real Estate Analysis Dashboard
 
 ## Overview
-This project scrapes, analyzes, and visualizes real estate data from Century 21 Albania, focusing on properties for sale in Tirana. It includes a web scraper, data cleaning pipeline, and an interactive Streamlit dashboard.
+This project scrapes, analyzes, and visualizes real estate data from a website, focusing on properties for sale in Tirana. It includes a web scraper, data cleaning pipeline, and an interactive Streamlit dashboard.
 
 ## Features
 - Web scraping of Century 21 Albania property listings
@@ -46,7 +46,7 @@ Start the Streamlit dashboard:
 ```bash
 streamlit run dashboard.py
 ```
-
+![Example Image](https://github.com/SaraBallkoci/Real_Estate_project/main/dashboard.PNG)
 ## Data Structure
 The dataset includes the following information for each property:
 - Price (in EUR)
