@@ -5,7 +5,7 @@ import numpy as np
 import re
 
 # Load the dataset
-df = pd.read_csv(r"C:\Users\User\Desktop\datapipeline\tirana_forsale.csv")
+df = pd.read_csv(r"C:\Users\User\Documents\GitHub\Real_Estate_project\tirana_forsale.csv")
 
 # Display basic info about the dataset
 def inspect_data(df):
@@ -112,5 +112,5 @@ if __name__ == "__main__":
     show_extreme_listings(df)
     
     # Save the cleaned dataset
-    df.to_csv(r"C:\Users\User\Desktop\datapipeline\tirane_sale_cleaned.csv", index=False)
+    df.to_csv(r"C:\Users\User\Documents\GitHub\Real_Estate_project\tirane_sale_cleaned.csv", index=False)
     print("Cleaned data saved as 'tirane_sale_cleaned.csv'.")

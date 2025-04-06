@@ -15,7 +15,7 @@ def load_data():
         print(df)
         df.columns = df.columns.str.strip()
 
-        # ✅ Convert numeric values correctly
+        # Convert numeric values correctly
         df["Price"] = pd.to_numeric(df["Price"], errors="coerce")
         df["SqFt"] = pd.to_numeric(df["SqFt"], errors="coerce")
 

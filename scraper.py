@@ -178,7 +178,7 @@ while True:
     
     
 df = pd.DataFrame(scraped_data)
-df.to_csv(r"C:\Users\User\Desktop\datapipeline\tirana_forsale.csv", index=False)
+df.to_csv(r"C:\Users\User\Documents\GitHub\Real_Estate_project\tirana_forsale.csv", index=False)
 print(f"✅{len(df)} listings saved!")
 
 driver.quit()
