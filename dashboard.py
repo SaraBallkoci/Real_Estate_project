@@ -11,7 +11,7 @@ import numpy as np
 @st.cache_data
 def load_data():
     try:
-        df = pd.read_csv(r"C:\Users\User\Desktop\datapipeline\tirane_sale_cleaned.csv")
+        df = pd.read_csv("tirane_sale_cleaned.csv")
         print(df)
         df.columns = df.columns.str.strip()
 
@@ -23,7 +23,7 @@ def load_data():
     except Exception as e:
         st.error(f"⚠️ Error loading data: {str(e)}")
         return pd.DataFrame()  # Return an empty DataFrame if error occurs
-  
+
 
 df = load_data()
 df["Neighborhood"] = df["Address"].str.split(",").str[0].str.strip()
@@ -45,9 +45,9 @@ else:
     max_price_value = int(df["Price"].max())  # e.g., 2,000,000
 
     min_price, max_price = st.sidebar.slider(
-        "Select Price Range (€)", 
-        min_value=min_price_value, 
-        max_value=max_price_value, 
+        "Select Price Range (€)",
+        min_value=min_price_value,
+        max_value=max_price_value,
         value=(min_price_value, max_price_value),
         step=5000,  # Adjust as needed
         format="%d€"
@@ -61,21 +61,21 @@ else:
     max_sqft = int(df["SqFt"].max())  # 565
 
     selected_sqft = st.sidebar.slider(
-    "Square Footage (m²)", 
-    min_value=min_sqft, 
-    max_value=max_sqft, 
+    "Square Footage (m²)",
+    min_value=min_sqft,
+    max_value=max_sqft,
     value=(min_sqft, max_sqft),
     step=10
 )
-    
+
     show_top_5_cheap = st.sidebar.checkbox("Show Top 10 Cheapest", value=False)
     if show_top_5_cheap:
             filtered_df = df.nsmallest(10, 'Price')
-        
+
     show_top_5_expensive = st.sidebar.checkbox("Show Top 10 Most Expensive", value=False)
     if show_top_5_expensive:
         filtered_df = df.nlargest(10, 'Price')
-        
+
     neighborhoods = ["All"] + sorted(df["Neighborhood"].dropna().unique().tolist())
     selected_neighborhood = st.sidebar.selectbox("Select Neighborhood", ["All"] + sorted(df["Neighborhood"].unique().tolist()))
 
@@ -84,13 +84,13 @@ else:
         (df["Price"] >= min_price) & (df["Price"] <= max_price) &
        # (df["Beds"] >= selected_beds[0]) & (df["Beds"] <= selected_beds[1]) &
         (df["SqFt"] >= selected_sqft[0]) & (df["SqFt"] <= selected_sqft[1])
-        
+
     ]
-    
+
     if selected_neighborhood != "All":
         filtered_df = filtered_df[filtered_df["Neighborhood"] == selected_neighborhood]
-        
- 
+
+
 
 
 # Display Data Table with Interactive Selection
@@ -98,7 +98,7 @@ st.subheader(f"📊 {len(filtered_df)} Listings Found")
 
 # Create an interactive table where users can select a row
 selected_rows = st.data_editor(
-    filtered_df[["Price", "Address","SqFt","Link"]]	
+    filtered_df[["Price", "Address","SqFt","Link"]]
     .sort_values(by="Price", ascending=False)
     .reset_index(drop=True),
     use_container_width=True,  # Makes the table responsive
@@ -129,7 +129,7 @@ st.pyplot(fig)
 st.subheader("💰 Price Distribution")
 with st.container():
     fig, ax = plt.subplots(figsize=(8, 4))
-    
+
     # Plot histogram
     sns.histplot(filtered_df["Price"], bins=30, kde=True, ax=ax)
 
