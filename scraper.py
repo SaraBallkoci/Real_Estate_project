@@ -135,7 +135,7 @@ while True:
 
         # Extract listing link
         try:
-            link_element = driver.find_element(
+            link_element = listing.find_element(
                 By.CSS_SELECTOR, "a.h-full.c-card.block.bg-white-shade-99-to-gray-08.overflow-hidden.p-4.relative.card-shadow")
             link = link_element.get_attribute("href")
             # link = f"https://www.century21albania.com/{link}" if link.startswith("/") else link

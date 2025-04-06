@@ -26,6 +26,7 @@ def load_data():
   
 
 df = load_data()
+df["Neighborhood"] = df["Address"].str.split(",").str[0].str.strip()
 
 # Streamlit UI
 st.title("🏡 Tirana Real Estate Dashboard")
@@ -40,30 +41,43 @@ show_all = st.sidebar.checkbox("Show All Properties", value=False)
 if show_all:
     filtered_df = df  # Show all properties
 else:
-    # Determine the max price dynamically and round up to the next 1 million
-    min_price_value = max(5, df["Price"].min())  # Ensure minimum is at least 1,000
-    max_price_value = np.ceil(df["Price"].max() / 1_000_000) * 1_000_000  # Round up to next 1M
+    min_price_value = int(df["Price"].min())  # e.g., 25,000
+    max_price_value = int(df["Price"].max())  # e.g., 2,000,000
 
-    # Price Slider
     min_price, max_price = st.sidebar.slider(
         "Select Price Range (€)", 
-        min_value=int(min_price_value), 
-        max_value=int(max_price_value), 
-        value=(int(min_price_value), int(max_price_value)),
+        min_value=min_price_value, 
+        max_value=max_price_value, 
+        value=(min_price_value, max_price_value),
+        step=5000,  # Adjust as needed
         format="%d€"
     )
-
     # Bedrooms: Round up to the next multiple of 5
     #min_beds = 1
     #max_beds = int(np.ceil(df["Beds"].max() / 5) * 5)
 
     # Square Footage: Ensure a sensible range
-    min_sqft = 50
-    max_sqft = int(np.ceil(df["SqFt"].max() / 10_000) * 10_000)
+    min_sqft = int(df["SqFt"].min())
+    max_sqft = int(df["SqFt"].max())  # 565
 
-    # Filters
-    #selected_beds = st.sidebar.slider("Bedrooms", min_beds, max_beds, (1, 5))
-    selected_sqft = st.sidebar.slider("Square Footage", min_sqft, max_sqft, (50, 5000))
+    selected_sqft = st.sidebar.slider(
+    "Square Footage (m²)", 
+    min_value=min_sqft, 
+    max_value=max_sqft, 
+    value=(min_sqft, max_sqft),
+    step=10
+)
+    
+    show_top_5_cheap = st.sidebar.checkbox("Show Top 10 Cheapest", value=False)
+    if show_top_5_cheap:
+            filtered_df = df.nsmallest(10, 'Price')
+        
+    show_top_5_expensive = st.sidebar.checkbox("Show Top 10 Most Expensive", value=False)
+    if show_top_5_expensive:
+        filtered_df = df.nlargest(10, 'Price')
+        
+    neighborhoods = ["All"] + sorted(df["Neighborhood"].dropna().unique().tolist())
+    selected_neighborhood = st.sidebar.selectbox("Select Neighborhood", ["All"] + sorted(df["Neighborhood"].unique().tolist()))
 
     # Apply Filters
     filtered_df = df[
@@ -72,13 +86,11 @@ else:
         (df["SqFt"] >= selected_sqft[0]) & (df["SqFt"] <= selected_sqft[1])
         
     ]
-    show_top_5_cheap = st.sidebar.checkbox("Show Top 10 Cheapest", value=False)
-    if show_top_5_cheap:
-        filtered_df = df.nsmallest(10, 'Price')
+    
+    if selected_neighborhood != "All":
+        filtered_df = filtered_df[filtered_df["Neighborhood"] == selected_neighborhood]
         
-    show_top_5_expensive = st.sidebar.checkbox("Show Top 10 Most Expensive", value=False)
-    if show_top_5_expensive:
-        filtered_df = df.nlargest(10, 'Price')
+ 
 
 
 # Display Data Table with Interactive Selection
@@ -97,8 +109,21 @@ selected_rows = st.data_editor(
     key="table_selection"
 )
 
-# Get selected address (if any)
-selected_address = selected_rows.iloc[0]["Address"] if not selected_rows.empty else None
+
+st.subheader("🏘️ Listings by Neighborhood")
+
+top_neighborhoods = (
+    filtered_df["Neighborhood"]
+    .value_counts()
+    .head(10)  # top 10 areas
+    .sort_values(ascending=True)
+)
+
+fig, ax = plt.subplots(figsize=(8, 5))
+top_neighborhoods.plot(kind="barh", ax=ax, color="skyblue")
+ax.set_xlabel("Number of Listings")
+ax.set_title("Top Neighborhoods in Tirana")
+st.pyplot(fig)
 
 # Price Distribution
 st.subheader("💰 Price Distribution")
@@ -108,8 +133,7 @@ with st.container():
     # Plot histogram
     sns.histplot(filtered_df["Price"], bins=30, kde=True, ax=ax)
 
-    # Format x-axis: Convert to millions and append "M"
-    ax.xaxis.set_major_formatter(mtick.FuncFormatter(lambda x, _: f'€{x/100_000:.0f}00000'))
+    ax.xaxis.set_major_formatter(mtick.StrMethodFormatter('{x:,.0f}'))
 
     ax.set_xlabel("Price (€)")
     ax.set_ylabel("Count")
@@ -130,5 +154,15 @@ with st.container():
 
 #    st.pyplot(fig)
 
+# 📥 Download filtered data
+st.subheader("⬇️ Download Listings")
+csv_data = filtered_df.to_csv(index=False).encode("utf-8")
+
+st.download_button(
+    label="Download CSV",
+    data=csv_data,
+    file_name="tirana_filtered_listings.csv",
+    mime="text/csv"
+)
 
 st.write("Data Source: Century 21")
