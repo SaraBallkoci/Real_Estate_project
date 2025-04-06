@@ -50,7 +50,7 @@ def convert_columns(df):
     
     # Convert SqFt column: Replace non-numeric characters, handle empty values
     df['SqFt'] = df['SqFt'].replace(['—', '', 'N/A'], np.nan)  # Handle missing values
-    df['SqFt'] = df['SqFt'].str.replace('[m2,]', '', regex=True)  # Remove commas
+    df['SqFt'] = df['SqFt'].str.replace(r'\s*m2', '', regex=True)
     df['SqFt'] = pd.to_numeric(df['SqFt'], errors='coerce')  # Convert to float safely
     
     # Convert Beds & Baths: Extract numbers from text and convert to float
