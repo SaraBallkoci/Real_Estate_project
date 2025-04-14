@@ -5,7 +5,7 @@
 This project scrapes, analyzes, and visualizes real estate data from a website, focusing on properties for sale in Tirana. It includes a web scraper, data cleaning pipeline, and an interactive Streamlit dashboard.
 
 ## Features
-- Web scraping of Century 21 Albania property listings
+- Web scraping of websites like Century 21 and Remax property listings
 - Data cleaning and preprocessing
 - Interactive dashboard with:
   - Price range filtering
@@ -65,5 +65,5 @@ See requirements.txt for complete list of dependencies.
 - Filtered data can be downloaded as CSV
 
 ## Data Source
-All data is sourced from Century 21 Albania's website.
+All data is sourced from Century 21 Albania and Remax's website.
 ```
